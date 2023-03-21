@@ -8,6 +8,6 @@ keywords:
 - influxdata
 home: https://www.influxdata.com/time-series-platform/telegraf/
 maintainers:
-- name: 
-  email: 
-engine: gotpl
+- name: mohamed aly amin
+  email: contact@mohamedalyamin.com 
+apiVersion: v2

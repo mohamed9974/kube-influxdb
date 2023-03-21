@@ -13,13 +13,14 @@ function main
 		kubectl create -f rbac-config.yaml
 		kubectl create serviceaccount --namespace kube-system tiller
 		kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-		
+		kubectl create namespace tick
+
 		# create kube state metrics
 		kubectl apply -f kube-state-metrics/
 		
 		# Initiaize the helm in the cluster
-		helm init 
-		sleep 20;
+		# helm init 
+		# sleep 20;
 		
 		# create tiller deploy patched
 		kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'      
@@ -53,8 +54,8 @@ function create_chart
 	if [ $service == "influxdb" ] || [ $service == "all" ]; then
 		# Deploying Influxdb service
 		echo Deploying Influxdb .....
-		helm install --name data --namespace tick influxdb
-		sleep 30;	
+		helm install data --namespace tick influxdb
+		sleep 15;	
 		printf "\n\n=======================================================================\n"
 		echo "Influxdb Endpoint URL:" $cluster_name:$influx_port
 		printf "\n\n=======================================================================\n"	
@@ -63,8 +64,8 @@ function create_chart
 	if [ $service == "kapacitor" ] || [ $service == "all" ]; then
 		# Deploying kapacitor service
 		echo Deploying Kapacitor .....
-        helm install --name alerts --namespace tick kapacitor
-		sleep 30;
+        helm install   alerts --namespace tick kapacitor
+		sleep 15;
 		printf "\n\n=======================================================================\n"
 		echo "Kapacitor Endpoint URL:" $cluster_name:$kapacitor_port
 		printf "\n\n=======================================================================\n"
@@ -73,20 +74,20 @@ function create_chart
 	if [ $service == "telegraf-s" ] || [ $service == "all" ]; then
 		# Deploying telegraf-ds service
 		echo Deploying telegraf-s .....
-	 	helm install --name polling --namespace tick telegraf-s
+	 	helm install   polling --namespace tick telegraf-s
 		
 	fi	
 
 	if [ $service == "telegraf-ds" ] || [ $service == "all" ]; then
 		# Deploying telegraf-ds service
 		echo Deploying telegraf-s .....
-	 	helm install --name hosts --namespace tick telegraf-ds
+	 	helm install   hosts --namespace tick telegraf-ds
 	fi
 
 	if [ $service == "chronograf" ] || [ $service == "all" ]; then
 		# Deploying chronograf service
 		echo Deploying Chronograf .....
-		helm install --name dash --namespace tick chronograf
+		helm install   dash --namespace tick chronograf
 		sleep 60;
 		create_dashboard
 		printf "\n\n=======================================================================\n"
@@ -129,17 +130,17 @@ function destroy_chart
 	service=$1
 	echo "Destorying chart of" $service
 	if [ $service == "influxdb" ]; then
-		helm delete data --purge
+		helm delete data 
 	elif [ $service == "kapacitor" ]; then
-		helm delete alerts --purge	
+		helm delete alerts 	
 	elif [ $service == "chronograf" ]; then
-		helm delete dash --purge
+		helm delete dash 
 	elif [ $service == "telegraf-s" ]; then
-		helm delete polling --purge
+		helm delete polling 
 	elif [ $service == "telegraf-ds" ]; then
-		helm delete hosts --purge
+		helm delete hosts
 	else	
-		helm delete data alerts dash polling hosts --purge
+		helm delete data alerts dash polling hosts
 	fi
 }
 
